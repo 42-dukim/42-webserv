@@ -1,6 +1,6 @@
-#include "../include/Server.hpp"
+#include "server/Server.hpp"
 
-int main(){
+int main() {
 	Config config(8080);
 	Server server(config);
 	server.runServer();

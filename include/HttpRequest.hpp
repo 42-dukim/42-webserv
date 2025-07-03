@@ -1,9 +1,9 @@
 #ifndef HTTPREQUEST_HPP
-# define HTTPREQUEST_HPP
+#define HTTPREQUEST_HPP
 
-# include <string>
+#include <string>
 
-# include "HttpPacket.hpp"
+#include "HttpPacket.hpp"
 
 class HttpRequest : public HttpPacket {
 	private:
@@ -11,7 +11,8 @@ class HttpRequest : public HttpPacket {
 		std::string _target;
 
 	public:
-		HttpRequest(std::string header, std::string body, std::string httpMethod, std::string target);
+		HttpRequest(std::string header, std::string body,
+					std::string httpMethod, std::string target);
 };
 
 #endif

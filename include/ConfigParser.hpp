@@ -1,14 +1,13 @@
 #ifndef CONFIGPARSER_HPP
-# define CONFIGPASER_HPP
+#define CONFIGPASER_HPP
 
-# include <string>
+#include <string>
 
-# include "Config.hpp"
+#include "Config.hpp"
 
 class ConfigParser {
 	public:
-		Config	parseConfig(std::string configPath);
-
+		Config parseConfig(std::string configPath);
 };
 
 #endif

@@ -1,12 +1,11 @@
 #ifndef FILEPARSER_HPP
-# define FILEPARSER_HPP
+#define FILEPARSER_HPP
 
-# include <string>
+#include <string>
 
 class FileParser {
 	public:
-		static std::string	parseFile(std::string filePath);
-
+		static std::string parseFile(std::string filePath);
 };
 
 #endif
