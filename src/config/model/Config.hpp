@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#include "exception/ConfigException.hpp"
+#include "../exception/ConfigException.hpp"
 
 struct ConfigLocation {
 		std::string				 _root;
@@ -15,6 +15,7 @@ struct ConfigLocation {
 
 class Config {
 	private:
+		bool								  _auto_index;
 		int									  _listen;
 		std::string							  _server_name;
 		std::string							  _index;
@@ -28,6 +29,7 @@ class Config {
 		~Config() {}
 
 		// getter
+		bool										 getAutoIndex() const;
 		int											 getListen() const;
 		const std::string&							 getServerName() const;
 		const std::string&							 getIndex() const;
@@ -39,6 +41,7 @@ class Config {
 			const std::string&) const;
 
 		// setter
+		void setAutoIndex(bool);
 		void setListen(int);
 		void setServerName(const std::string&);
 		void setIndex(const std::string&);

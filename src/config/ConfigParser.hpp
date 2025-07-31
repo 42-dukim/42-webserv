@@ -20,6 +20,8 @@ class ConfigParser {
 		std::vector<std::string> tokenize(std::string&);
 		bool expectToken(const std::vector<std::string>&, unsigned long,
 						 const std::string&) const;
+		void parseAutoIndex(const std::vector<std::string>&, Config&,
+							unsigned long&);
 		void parseListen(const std::vector<std::string>&, Config&,
 						 unsigned long&);
 		void parseServerName(const std::vector<std::string>&, Config&,
@@ -32,16 +34,16 @@ class ConfigParser {
 							   const std::string&, unsigned long&);
 		void parseLocationIndex(const std::vector<std::string>&, Config&,
 								const std::string&, unsigned long&);
-		void parseLocationAllowMethod(const std::vector<std::string>&, Config&,
-									  const std::string&, unsigned long&);
+		void parseLocationAllowMethods(const std::vector<std::string>&, Config&,
+									   const std::string&, unsigned long&);
 		void parseLocation(const std::vector<std::string>&, Config&,
 						   unsigned long&);
 		Config parseServer(const std::vector<std::string>&, unsigned long&);
 		void   parse(const std::vector<std::string>&);
 
 	public:
-		ConfigParser() {}
-		~ConfigParser() {}
+		ConfigParser() { }
+		~ConfigParser() { }
 
 		bool					   validateArgument(int);
 		void					   loadFromFile(char*);

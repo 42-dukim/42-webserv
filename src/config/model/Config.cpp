@@ -1,10 +1,11 @@
 #include "Config.hpp"
 
-Config::Config() : _listen(-1), _server_name("_"), _index("index.html") {}
+Config::Config() : _auto_index(false), _listen(-1), _server_name("_"), _index("index.html") {}
 
 Config::Config(const Config& other) { *this = other; }
 
 Config& Config::operator=(const Config& other) {
+	_auto_index = other._auto_index;
 	_listen = other._listen;
 	_server_name = other._server_name;
 	_index = other._index;
@@ -12,6 +13,8 @@ Config& Config::operator=(const Config& other) {
 	_location = other._location;
 	return *this;
 }
+
+bool Config::getAutoIndex() const { return _auto_index; }
 
 int Config::getListen() const { return _listen; }
 
@@ -24,6 +27,8 @@ const std::string& Config::getRoot() const { return _root; }
 const std::map<std::string, ConfigLocation>& Config::getLocation() const {
 	return _location;
 }
+
+void Config::setAutoIndex(bool status) { _auto_index = status; }
 
 void Config::setListen(int listen) { _listen = listen; }
 

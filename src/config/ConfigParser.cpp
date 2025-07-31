@@ -1,10 +1,10 @@
 #include "ConfigParser.hpp"
 
 bool ConfigParser::validateArgument(int ac) {
-	if (ac > 2)
-		throw ConfigException("[Error] Invalid Argument");
-	else if (ac == 2)
+	if (ac == 2)
 		return true;
+	else
+		throw ConfigException("[Error] Invalid Argument");
 	return false;
 }
 
@@ -66,6 +66,19 @@ void ConfigParser::parseListen(const std::vector<std::string>& tokens,
 	expectToken(tokens, ++i, ";");
 }
 
+void ConfigParser::parseAutoIndex(const std::vector<std::string>& tokens,
+								  Config& Config, unsigned long& i) {
+	std::string status = tokens.at(i);
+	if (status == "on")
+		Config.setAutoIndex(true);
+	else if (status == "off")
+		Config.setAutoIndex(false);
+	else
+		throw ConfigException(
+			"[emerg] Invalid configuration: autoindex value '" + status + "'");
+	expectToken(tokens, ++i, ";");
+}
+
 void ConfigParser::parseServerName(const std::vector<std::string>& tokens,
 								   Config& Config, unsigned long& i) {
 	Config.setServerName(tokens.at(i));
@@ -98,7 +111,7 @@ void ConfigParser::parseLocationIndex(const std::vector<std::string>& tokens,
 	expectToken(tokens, ++i, ";");
 }
 
-void ConfigParser::parseLocationAllowMethod(
+void ConfigParser::parseLocationAllowMethods(
 	const std::vector<std::string>& tokens, Config& Config,
 	const std::string& url, unsigned long& i) {
 	std::vector<std::string> tmpMethods;
@@ -119,8 +132,8 @@ void ConfigParser::parseLocation(const std::vector<std::string>& tokens,
 			parseLocationRoot(tokens, Config, url, ++i);
 		else if (tokens.at(i) == "index")
 			parseLocationIndex(tokens, Config, url, ++i);
-		else if (tokens.at(i) == "allow_method")
-			parseLocationAllowMethod(tokens, Config, url, ++i);
+		else if (tokens.at(i) == "allow_methods")
+			parseLocationAllowMethods(tokens, Config, url, ++i);
 		else
 			throw ConfigException(
 				"[emerg] Invalid configuration: Unknown directive " +
@@ -137,6 +150,8 @@ Config ConfigParser::parseServer(const std::vector<std::string>& tokens,
 	while (tokens.at(++i) != "}") {
 		if (tokens.at(i) == "listen")
 			parseListen(tokens, Config, ++i);
+		else if (tokens.at(i) == "autoindex")
+			parseAutoIndex(tokens, Config, ++i);
 		else if (tokens.at(i) == "server_name")
 			parseServerName(tokens, Config, ++i);
 		else if (tokens.at(i) == "index")
