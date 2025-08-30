@@ -10,7 +10,7 @@ class PacketLineState : public ParseState {
 	public:
 		PacketLineState() : _done(false) {}
 
-		virtual void parse(HttpParser*, const std::string&);
+		virtual void parse(HttpParser*);
 		virtual void handleNextState(HttpParser*);
 
 	private:

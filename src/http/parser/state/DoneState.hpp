@@ -9,7 +9,7 @@
 
 class DoneState : public ParseState {
 	public:
-		virtual void parse(HttpParser*, const std::string&);
+		virtual void parse(HttpParser*);
 		virtual void handleNextState(HttpParser*);
 };
 

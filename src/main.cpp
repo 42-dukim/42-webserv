@@ -7,7 +7,7 @@ int main(int argc, char* argv[]) {
 		ConfigParser parser;
 		if (parser.validateArgument(argc)) parser.loadFromFile(argv[1]);
 		std::vector<Config> configs = parser.getConfigs();
-		Server				server(configs);
+		Server server(configs);
 		server.runServer();
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << '\n';

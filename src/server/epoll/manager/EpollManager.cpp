@@ -23,15 +23,18 @@ void EpollManager::deleteEpollFd(int socketFd) {
 }
 
 void EpollManager::waitEvent() {
-	if ((_eventCount =
-			 (epoll_wait(_epollFd, (struct epoll_event*) _epollEvents.data(),
-						 EPOLL_SIZE, 1000))) == -1)
+	if ((_eventCount = (epoll_wait(_epollFd, (struct epoll_event*) _epollEvents.data(), EPOLL_SIZE,
+								   1000))) == -1)
 		throw EpollException("wait event");
 }
 
-int EpollManager::getEpollFd() const { return _epollFd; }
+int EpollManager::getEpollFd() const {
+	return _epollFd;
+}
 
-int EpollManager::getEventCount() const { return _eventCount; }
+int EpollManager::getEventCount() const {
+	return _eventCount;
+}
 
 const struct epoll_event& EpollManager::getEpollEventsAt(int index) const {
 	if (index < 0 || static_cast<int>(_epollEvents.size()) <= index) {

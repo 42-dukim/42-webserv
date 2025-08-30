@@ -24,8 +24,7 @@ const std::map<std::string, std::string>& Header::getHeaders() const {
 }
 
 const std::string& Header::get(std::string key) const {
-	std::map<std::string, std::string>::const_iterator it =
-		_headers.find(to_lower(key));
+	std::map<std::string, std::string>::const_iterator it = _headers.find(to_lower(key));
 	return (it != _headers.end()) ? it->second : EMPTY_STRING;
 }
 

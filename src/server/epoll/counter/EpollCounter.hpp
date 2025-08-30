@@ -10,14 +10,14 @@
 class EpollCounter {
 	private:
 		std::vector<int> _epollFdVector;
-		int				 _epollCount;
+		int _epollCount;
 
 	public:
 		EpollCounter();
 
 		bool addFd(int);
 		bool deleteFd(int);
-		int	 popFd();
+		int popFd();
 };
 
 #endif

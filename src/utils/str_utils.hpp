@@ -7,7 +7,7 @@
 #include <sstream>
 
 std::string int_tostr(int);
-int			str_toint(const std::string&);
+int str_toint(const std::string&);
 std::string to_lower(const std::string&);
 
 #endif

@@ -5,19 +5,19 @@
 
 #include "../HttpParser.hpp"
 
-void PacketLineState::parse(HttpParser* parser, const std::string& line) {
+void PacketLineState::parse(HttpParser* parser) {
+	std::string line = parser->readLine();
+	std::string t1, t2, rest;
 	std::istringstream iss(line);
-	std::string		   str1, str2, str3;
+	iss >> t1 >> t2;
+	std::getline(iss, rest);
+	if (!rest.empty() && rest[0] == ' ') rest.erase(0, 1);
 
-	iss >> str1 >> str2 >> str3;
-	if (HTTP::Method::to_value(str1) != HTTP::Method::UNKNOWN_METHOD) {
-		HTTP::StartLine startLine = {HTTP::Method::to_value(str1), str2, str3};
-
+	if (HTTP::Method::to_value(t1) != HTTP::Method::UNKNOWN_METHOD) {
+		HTTP::StartLine startLine = {HTTP::Method::to_value(t1), t2, rest};
 		parser->_packet = new HttpPacket(startLine, Header(), Body());
 	} else {
-		HTTP::StatusLine statusLine = {"HTTP/1.1",
-									   HTTP::StatusCode::to_value(str2), str3};
-
+		HTTP::StatusLine statusLine = {t1, HTTP::StatusCode::to_value(t2), rest};
 		parser->_packet = new HttpPacket(statusLine, Header(), Body());
 	}
 	_done = true;

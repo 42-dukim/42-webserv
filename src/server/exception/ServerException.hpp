@@ -10,10 +10,12 @@ class ServerException : public std::exception {
 		std::string _message;
 
 	public:
-		ServerException(const std::string& message)
-			: _message("[Error] Server " + message + " Error") {}
+		ServerException(const std::string& message) :
+			_message("[Error] Server " + message + " Error") {}
 
-		virtual const char* what() const throw() { return _message.c_str(); }
+		virtual const char* what() const throw() {
+			return _message.c_str();
+		}
 
 		virtual ~ServerException() throw() {}
 };

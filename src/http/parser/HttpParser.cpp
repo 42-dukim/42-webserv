@@ -3,10 +3,10 @@
 
 #include <sstream>
 
-#include "exception/HttpParseException.hpp"
+#include "exception/HttpParserException.hpp"
 
-HttpParser::HttpParser(const std::string& rawData)
-	: _currentState(new PacketLineState()), _rawData(rawData), _packet(NULL) {}
+HttpParser::HttpParser(const std::string& rawData) :
+	_currentState(new PacketLineState()), _rawData(rawData), _pos(0), _packet(NULL) {}
 
 HttpParser::~HttpParser() {
 	delete _currentState;
@@ -21,26 +21,43 @@ void HttpParser::changeState(ParseState* newState) {
 }
 
 void HttpParser::parse() {
-	size_t offset = 0;
-	size_t next;
-
-	while ((next = _rawData.find("\r\n", offset)) != std::string::npos) {
-		std::string line = _rawData.substr(offset, next - offset);
-		_currentState->parse(this, line);
+	while (true) {
+		_currentState->parse(this);
 		_currentState->handleNextState(this);
-
-		if (dynamic_cast<DoneState*>(_currentState)) {
-			if (next + 2 < _rawData.size())
-				throw HttpParseException("Invalid Content-Length header value",
-										 HTTP::StatusCode::BadRequest);
-			return;
-		}
-		offset = next + 2;
+		if (dynamic_cast<DoneState*>(_currentState)) break;
 	}
 
-	if (!dynamic_cast<DoneState*>(_currentState))
-		throw HttpParseException("Malformed request: Invalid line ending",
-								 HTTP::StatusCode::BadRequest);
+	// Done 이후 추가 바이트가 남아있으면(파이프라이닝 미지원) 오류 처리
+	if (_pos != _rawData.size())
+		throw HttpParserException("Unexpected extra bytes after HTTP message",
+								  HTTP::StatusCode::BadRequest);
 }
 
-HttpPacket HttpParser::getResult() { return *_packet; }
+HttpPacket HttpParser::getResult() {
+	return *_packet;
+}
+
+std::string HttpParser::readLine() {
+	size_t next = _rawData.find("\r\n", _pos);
+	if (next == std::string::npos)
+		throw HttpParserException("Malformed request: Invalid line ending",
+								  HTTP::StatusCode::BadRequest);
+	std::string line = _rawData.substr(_pos, next - _pos);
+	_pos = next + 2;
+
+	return line;
+}
+
+std::string HttpParser::readBytes(size_t n) {
+	if (_pos + n > _rawData.size())
+		throw HttpParserException("Malformed request: Body incomplete",
+								  HTTP::StatusCode::BadRequest);
+	std::string chunk = _rawData.substr(_pos, n);
+	_pos += n;
+
+	return chunk;
+}
+
+size_t HttpParser::remaining() const {
+	return _rawData.size() - _pos;
+}

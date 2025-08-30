@@ -3,16 +3,16 @@
 
 #include <algorithm>
 
-void BodyState::parse(HttpParser* parser, const std::string& line) {
+void BodyState::parse(HttpParser* parser) {
 	if (_remain == 0) {
 		_done = true;
 		return;
 	}
 
-	size_t toCopy = std::min(_remain, line.size());
-	parser->_packet->appendBody(line.data(), toCopy);
-	_remain -= toCopy;
-	if (_remain == 0) _done = true;
+	std::string chunk = parser->readBytes(_remain);
+	parser->_packet->appendBody(chunk.data(), chunk.size());
+	_remain = 0;
+	_done = true;
 }
 
 void BodyState::handleNextState(HttpParser* parser) {

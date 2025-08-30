@@ -10,9 +10,13 @@ class ConfigException : public std::exception {
 		std::string _exception;
 
 	public:
-		ConfigException(std::string e) { _exception = e; }
+		ConfigException(std::string e) {
+			_exception = e;
+		}
 		~ConfigException() throw() {}
-		virtual const char* what() const throw() { return _exception.c_str(); }
+		virtual const char* what() const throw() {
+			return _exception.c_str();
+		}
 };
 
 #endif

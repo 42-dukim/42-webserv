@@ -10,7 +10,7 @@ class HttpParser;
 class ParseState {
 	public:
 		virtual ~ParseState() {};
-		virtual void parse(HttpParser*, const std::string&) = 0;
+		virtual void parse(HttpParser*) = 0;
 		virtual void handleNextState(HttpParser*) = 0;
 };
 

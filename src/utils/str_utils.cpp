@@ -9,7 +9,7 @@ std::string int_tostr(int num) {
 
 int str_toint(const std::string& str) {
 	std::stringstream s;
-	int				  num;
+	int num;
 
 	s << str;
 	s >> num;
@@ -18,7 +18,6 @@ int str_toint(const std::string& str) {
 
 std::string to_lower(const std::string& str) {
 	std::string lower_str = str;
-	std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(),
-				   ::tolower);
+	std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
 	return lower_str;
 }

@@ -26,22 +26,22 @@
 class Server {
 	private:
 		std::vector<Config> _configs;
-		std::set<int>		_serverSockets;
-		int					_clientSocket;
-		int					_socketOption;
-		int					_addressSize;
-		struct sockaddr_in	_serverAddress;
-		struct sockaddr_in	_clientAddress;
-		EpollManager		_epollManager;
+		std::set<int> _serverSockets;
+		int _clientSocket;
+		int _socketOption;
+		int _addressSize;
+		struct sockaddr_in _serverAddress;
+		struct sockaddr_in _clientAddress;
+		EpollManager _epollManager;
 
-		void		initAddress(int);
-		void		initServer();
-		void		loopServer();
-		void		writeHttpPacket(int, HttpPacket);
-		void		handleEvents();
-		void		writeSocket(int, std::string);
+		void initAddress(int);
+		void initServer();
+		void loopServer();
+		void writeHttpPacket(int, HttpPacket);
+		void handleEvents();
+		void writeSocket(int, std::string);
 		std::string readSocket(int);
-		HttpPacket	convertHttpPacket(std::string&);
+		HttpPacket convertHttpPacket(std::string&);
 
 	public:
 		Server(std::vector<Config>);

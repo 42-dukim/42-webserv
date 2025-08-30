@@ -18,7 +18,7 @@ class Header {
 		const std::map<std::string, std::string>& getHeaders() const;
 
 		const std::string& get(std::string) const;
-		void			   set(std::string, std::string);
+		void set(std::string, std::string);
 };
 
 #endif

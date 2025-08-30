@@ -15,6 +15,7 @@ class HttpParser {
 	private:
 		ParseState* _currentState;
 		std::string _rawData;
+		size_t _pos;
 		HttpPacket* _packet;
 
 		friend class PacketLineState;
@@ -26,9 +27,13 @@ class HttpParser {
 		HttpParser(const std::string&);
 		~HttpParser();
 
-		void	   parse();
+		void parse();
 		HttpPacket getResult();
-		void	   changeState(ParseState*);
+		void changeState(ParseState*);
+
+		std::string readLine();
+		std::string readBytes(size_t n);
+		size_t remaining() const;
 };
 
 #endif

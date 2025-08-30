@@ -10,10 +10,8 @@ bool EpollCounter::addFd(int fd) {
 }
 
 bool EpollCounter::deleteFd(int fd) {
-	if (std::find(_epollFdVector.begin(), _epollFdVector.end(), fd) !=
-		_epollFdVector.end()) {
-		_epollFdVector.erase(
-			std::find(_epollFdVector.begin(), _epollFdVector.end(), fd));
+	if (std::find(_epollFdVector.begin(), _epollFdVector.end(), fd) != _epollFdVector.end()) {
+		_epollFdVector.erase(std::find(_epollFdVector.begin(), _epollFdVector.end(), fd));
 		_epollCount--;
 		return true;
 	}

@@ -9,14 +9,14 @@
 namespace HTTP {
 	struct StartLine {
 			HTTP::Method::Value method;
-			std::string			target;
-			std::string			version;
+			std::string target;
+			std::string version;
 	};
 
 	struct StatusLine {
-			std::string				version;
+			std::string version;
 			HTTP::StatusCode::Value statusCode;
-			std::string				reasonPhrase;
+			std::string reasonPhrase;
 	};
 }
 

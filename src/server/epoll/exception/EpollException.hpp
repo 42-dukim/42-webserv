@@ -10,10 +10,12 @@ class EpollException : public std::exception {
 		std::string _message;
 
 	public:
-		EpollException(const std::string& message)
-			: _message("[Error] Epoll " + message + " Error") {}
+		EpollException(const std::string& message) :
+			_message("[Error] Epoll " + message + " Error") {}
 
-		virtual const char* what() const throw() { return _message.c_str(); }
+		virtual const char* what() const throw() {
+			return _message.c_str();
+		}
 
 		virtual ~EpollException() throw() {}
 };
