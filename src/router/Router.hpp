@@ -11,10 +11,6 @@
 
 namespace router {
 	class Router {
-		public:
-			Router() {}
-			RouteDecision route(const http::Packet&, const std::vector<config::Config>&, int) const;
-
 		private:
 			const config::Config* selectServer(const std::vector<config::Config>&, int) const;
 			std::string bestLocationPrefix(const config::Config&, const std::string&) const;
@@ -27,6 +23,10 @@ namespace router {
 			bool validateBodySize(const config::Config&, const http::Packet&, RouteDecision&) const;
 			bool decideResource(const config::Config&, const std::string&, const std::string&,
 								RouteDecision&) const;
+
+		public:
+			Router() {}
+			RouteDecision route(const http::Packet&, const std::vector<config::Config>&, int) const;
 	};
 }  // namespace router
 

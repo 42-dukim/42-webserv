@@ -21,18 +21,18 @@ namespace router {
 
 namespace handler {
 	class RequestHandler {
-		public:
-			RequestHandler();
-			~RequestHandler();
-
-			http::Packet handle(const http::Packet&, const std::vector<config::Config>&, int) const;
-
 		private:
 			router::Router _router;
 			std::map<router::RouteDecision::Action, builder::IBuilder*> _builders;
 			builder::IBuilder* _defaultBuilder;
 
 			const builder::IBuilder* selectBuilder(router::RouteDecision::Action) const;
+
+		public:
+			RequestHandler();
+			~RequestHandler();
+
+			http::Packet handle(const http::Packet&, const std::vector<config::Config>&, int) const;
 	};
 }  // namespace handler
 

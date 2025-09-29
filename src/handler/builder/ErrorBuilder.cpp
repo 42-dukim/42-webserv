@@ -7,6 +7,7 @@ using namespace handler::builder;
 
 std::string ErrorBuilder::joinAllowMethods(const std::vector<std::string>& methods) {
 	std::string allow;
+
 	for (size_t i = 0; i < methods.size(); ++i) {
 		if (i) allow += ", ";
 		allow += methods[i];

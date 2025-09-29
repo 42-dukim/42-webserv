@@ -1,0 +1,16 @@
+[config]
+response_language = "ko-KR"
+model="o4-mini"
+fallback_models=["gpt-5"]
+use_repo_settings_file = true
+patch_extension_skip_types = [".md", ".txt"]
+ignore_pr_title = ["^\\[Auto\\]", "^Auto", "^\\[Skip\\]", "^Skip"]
+
+
+[pr_reviewer]
+extra_instructions = """\
+1.반말을 사용하세요
+2.코드리뷰, suggestion, pr생성 모두 한글로 대답하세요
+3.코드 변경 전후의 문맥을 이해하는 데 주변 줄을 참고하되, 실제 변경된 부분에 초점을 맞춰 설명과 제안을 생성해 주세요.
+4.동료의 입장에서 이해하기 좋은지, 어떻게 수정하면 좋을지 피드백해 주세요.
+"""
