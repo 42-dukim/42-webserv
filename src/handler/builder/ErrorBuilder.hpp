@@ -7,12 +7,12 @@
 namespace handler {
 	namespace builder {
 		class ErrorBuilder : public IBuilder {
+			private:
+				static std::string joinAllowMethods(const std::vector<std::string>&);
+
 			public:
 				virtual http::Packet build(const router::RouteDecision&, const http::Packet&,
 										   const std::vector<config::Config>&) const;
-
-			private:
-				static std::string joinAllowMethods(const std::vector<std::string>&);
 		};
 	}  // namespace builder
 }  // namespace handler
