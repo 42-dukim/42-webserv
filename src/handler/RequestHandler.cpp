@@ -44,37 +44,37 @@ http::Packet RequestHandler::handle(const http::Packet& req,
 void RequestHandler::handleCgi(const http::Packet& req, const std::vector<config::Config>& configs,
 							   int localPort, int client_fd, server::EpollManager& epollManager) {
 	router::RouteDecision decision = _router.route(req, configs, localPort);
-	cgi::Builder cgiBuilder;
-	cgiBuilder.build(decision, req, epollManager, _cgiManager, client_fd);
+	cgi::Executor cgiExecutor;
+	cgiExecutor.execute(decision, req, epollManager, _cgiProcessManager, client_fd);
 }
 
 void RequestHandler::handleCgiEvent(int fd, server::EpollManager& epollManager) {
-	_cgiManager.handleCgiEvent(fd, epollManager);
+	_cgiProcessManager.handleCgiEvent(fd, epollManager);
 }
 
 int RequestHandler::getClientFd(int fd) const {
-	return _cgiManager.getClientFd(fd);
+	return _cgiProcessManager.getClientFd(fd);
 }
 
 bool RequestHandler::isCgiProcess(int fd) const {
-	return _cgiManager.isCgiProcess(fd);
+	return _cgiProcessManager.isCgiProcess(fd);
 }
 
 bool RequestHandler::isCgiProcessing(int clientFd) const {
-	return _cgiManager.isProcessing(clientFd);
+	return _cgiProcessManager.isProcessing(clientFd);
 }
 
 bool RequestHandler::isCgiCompleted(int fd) const {
-	return _cgiManager.isCompleted(fd);
+	return _cgiProcessManager.isCompleted(fd);
 }
 
 void RequestHandler::removeCgiProcess(int fd) {
-	_cgiManager.removeCgiProcess(fd);
+	_cgiProcessManager.removeCgiProcess(fd);
 }
 
 std::string RequestHandler::getCgiResponse(int fd) {
 	try {
-		std::string cgiOutput = _cgiManager.getResponse(fd);
+		std::string cgiOutput = _cgiProcessManager.getResponse(fd);
 		return utils::makeCgiResponse(cgiOutput);
 	} catch (const handler::Exception&) {
 		return utils::makeErrorResponse();

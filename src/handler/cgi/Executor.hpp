@@ -1,6 +1,6 @@
-// CgiBuilder.hpp
-#ifndef HANDLER_CGI_BUILDER_HPP
-#define HANDLER_CGI_BUILDER_HPP
+// Executor.hpp
+#ifndef HANDLER_CGI_EXECUTOR_HPP
+#define HANDLER_CGI_EXECUTOR_HPP
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -14,11 +14,11 @@
 #include "../../server/epoll/manager/EpollManager.hpp"
 #include "../exception/Exception.hpp"
 #include "../utils/response.hpp"
-#include "Manager.hpp"
+#include "ProcessManager.hpp"
 
 namespace handler {
 	namespace cgi {
-		class Builder {
+		class Executor {
 			private:
 				std::vector<std::string> _envStrings;
 				std::vector<char*> _envp;
@@ -28,10 +28,10 @@ namespace handler {
 				void setEnvp(const router::RouteDecision&, const http::Packet&);
 
 			public:
-				Builder() {}
-				~Builder() {}
-				void build(const router::RouteDecision&, const http::Packet&, server::EpollManager&,
-						   Manager&, int);
+				Executor() {}
+				~Executor() {}
+				void execute(const router::RouteDecision&, const http::Packet&,
+							 server::EpollManager&, cgi::ProcessManager&, int);
 		};
 	}  // namespace cgi
 }  // namespace handler

@@ -51,6 +51,10 @@ namespace config {
 		return _root;
 	}
 
+	const std::map<int, std::string>& Config::getErrorPages() const {
+		return _error_pages;
+	}
+
 	const std::map<std::string, LocationConfig>& Config::getLocation() const {
 		return _location;
 	}
@@ -77,6 +81,10 @@ namespace config {
 
 	void Config::setRoot(const std::string& root) {
 		_root = root;
+	}
+
+	void Config::setErrorPage(int statusCode, const std::string& path) {
+		_error_pages[statusCode] = path;
 	}
 
 	void Config::initLocation(const std::string& path) {

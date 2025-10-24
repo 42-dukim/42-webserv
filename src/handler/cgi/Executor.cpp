@@ -1,17 +1,17 @@
-// CgiBuilder.cpp
-#include "Builder.hpp"
+// Executor.cpp
+#include "Executor.hpp"
 
 #include "../../utils/str_utils.hpp"
 
 using namespace handler::cgi;
 
-void Builder::setArgv(const router::RouteDecision& decision) {
+void Executor::setArgv(const router::RouteDecision& decision) {
 	_argv.push_back(const_cast<char*>("/usr/bin/python3"));
 	_argv.push_back(const_cast<char*>(decision.fsPath.c_str()));
 	_argv.push_back(NULL);
 }
 
-void Builder::setEnvp(const router::RouteDecision& decision, const http::Packet& request) {
+void Executor::setEnvp(const router::RouteDecision& decision, const http::Packet& request) {
 	std::string requestMethod = http::Method::to_string(request.getStartLine().method);
 	std::string contentType = request.getHeader().get("Content-Type");
 	std::string contentLength = request.getHeader().get("Content-Length");
@@ -40,8 +40,9 @@ void Builder::setEnvp(const router::RouteDecision& decision, const http::Packet&
 	_envp.push_back(NULL);
 }
 
-void Builder::build(const router::RouteDecision& decision, const http::Packet& request,
-					server::EpollManager& epollManager, cgi::Manager& cgiManager, int clientFd) {
+void Executor::execute(const router::RouteDecision& decision, const http::Packet& request,
+					   server::EpollManager& epollManager, cgi::ProcessManager& cgiManager,
+					   int clientFd) {
 	int stdoutPipe[2], stdinPipe[2];
 	if (pipe2(stdoutPipe, O_NONBLOCK) == -1 || pipe(stdinPipe) == -1) {
 		throw Exception();
@@ -74,7 +75,6 @@ void Builder::build(const router::RouteDecision& decision, const http::Packet& r
 	close(stdoutPipe[1]);
 	close(stdinPipe[0]);
 
-	// 필요시 POST 데이터를 CGI로 전송
 	if (request.getStartLine().method == http::Method::POST) {
 		const std::vector<unsigned char>& bodyData = request.getBody().getData();
 		if (!bodyData.empty()) {
@@ -83,7 +83,6 @@ void Builder::build(const router::RouteDecision& decision, const http::Packet& r
 	}
 	close(stdinPipe[1]);
 
-	// 모니터링을 위해 CGI stdout을 epoll에 추가
 	epollManager.add(stdoutPipe[0], EPOLLIN | EPOLLET);
 	cgiManager.registerProcess(pid, stdoutPipe[0], clientFd);
 }

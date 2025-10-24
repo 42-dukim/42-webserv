@@ -16,6 +16,7 @@ namespace config {
 			bool expectToken(const std::vector<std::string>&, unsigned long,
 							 const std::string&) const;
 			void parseAutoIndex(const std::vector<std::string>&, Config&, unsigned long&);
+			void parseErrorPage(const std::vector<std::string>&, Config&, unsigned long&);
 			void parseListen(const std::vector<std::string>&, Config&, unsigned long&);
 			void parseClientMaxBodySize(const std::vector<std::string>&, Config&, unsigned long&);
 			void parseServerName(const std::vector<std::string>&, Config&, unsigned long&);

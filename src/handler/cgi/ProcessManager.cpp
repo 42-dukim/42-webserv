@@ -1,15 +1,16 @@
-#include "Manager.hpp"
+// ProcessManager.cpp
+#include "ProcessManager.hpp"
 
 using namespace handler::cgi;
 
-void Manager::sigchldHandler(int sig) {
+void ProcessManager::sigchldHandler(int sig) {
 	(void) sig;
 	int status;
 	while (waitpid(-1, &status, WNOHANG) > 0) {
 	}
 }
 
-int Manager::getClientFd(int cgiFd) const {
+int ProcessManager::getClientFd(int cgiFd) const {
 	std::map<int, Process>::const_iterator it = _activeProcesses.find(cgiFd);
 	if (it == _activeProcesses.end()) {
 		return -1;
@@ -17,7 +18,7 @@ int Manager::getClientFd(int cgiFd) const {
 	return it->second.clientFd;
 }
 
-void Manager::registerProcess(pid_t pid, int cgiFd, int clientFd) {
+void ProcessManager::registerProcess(pid_t pid, int cgiFd, int clientFd) {
 	Process process;
 	process.pid = pid;
 	process.cgiFd = cgiFd;
@@ -29,7 +30,7 @@ void Manager::registerProcess(pid_t pid, int cgiFd, int clientFd) {
 	_clientToCgi[clientFd] = cgiFd;
 }
 
-void Manager::handleCgiEvent(int cgiFd, server::EpollManager& epollManager) {
+void ProcessManager::handleCgiEvent(int cgiFd, server::EpollManager& epollManager) {
 	std::map<int, Process>::iterator it = _activeProcesses.find(cgiFd);
 	if (it == _activeProcesses.end()) {
 		return;
@@ -45,15 +46,15 @@ void Manager::handleCgiEvent(int cgiFd, server::EpollManager& epollManager) {
 	epollManager.remove(cgiFd);
 }
 
-bool Manager::isCgiProcess(int fd) const {
+bool ProcessManager::isCgiProcess(int fd) const {
 	return _activeProcesses.find(fd) != _activeProcesses.end();
 }
 
-bool Manager::isProcessing(int clientFd) const {
+bool ProcessManager::isProcessing(int clientFd) const {
 	return _clientToCgi.find(clientFd) != _clientToCgi.end();
 }
 
-bool Manager::isCompleted(int fd) const {
+bool ProcessManager::isCompleted(int fd) const {
 	std::map<int, int>::const_iterator it = _clientToCgi.find(fd);
 	if (it == _clientToCgi.end()) {
 		return false;
@@ -67,7 +68,7 @@ bool Manager::isCompleted(int fd) const {
 	return cgiIt->second.completed;
 }
 
-void Manager::removeCgiProcess(int clientFd) {
+void ProcessManager::removeCgiProcess(int clientFd) {
 	std::map<int, int>::iterator it = _clientToCgi.find(clientFd);
 	if (it != _clientToCgi.end()) {
 		int cgiFd = it->second;
@@ -78,7 +79,7 @@ void Manager::removeCgiProcess(int clientFd) {
 	}
 }
 
-std::string Manager::getResponse(int clientFd) {
+std::string ProcessManager::getResponse(int clientFd) {
 	std::map<int, int>::iterator it = _clientToCgi.find(clientFd);
 	if (it == _clientToCgi.end()) throw handler::Exception();
 

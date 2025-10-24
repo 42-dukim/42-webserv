@@ -27,7 +27,7 @@ Server::Server(const std::vector<config::Config>& configs) :
 	_configs(configs), _clientSocket(-1), _socketOption(1), _addressSize(sizeof(_serverAddress)) {
 	struct sigaction sa;
 
-	sa.sa_handler = handler::cgi::Manager::sigchldHandler;
+	sa.sa_handler = handler::cgi::ProcessManager::sigchldHandler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
 	if (sigaction(SIGCHLD, &sa, NULL) == -1) {

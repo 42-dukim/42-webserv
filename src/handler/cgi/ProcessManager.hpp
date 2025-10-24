@@ -1,5 +1,6 @@
-#ifndef HANDLER_BUILDER_CGI_MANAGER_HPP
-#define HANDLER_BUILDER_CGI_MANAGER_HPP
+// ProcessManager.hpp
+#ifndef HANDLER_CGI_PROCESS_MANAGER_HPP
+#define HANDLER_CGI_PROCESS_MANAGER_HPP
 
 #include <signal.h>
 #include <sys/types.h>
@@ -16,7 +17,7 @@
 
 namespace handler {
 	namespace cgi {
-		class Manager {
+		class ProcessManager {
 			private:
 				struct Process {
 						pid_t pid;
@@ -30,8 +31,8 @@ namespace handler {
 				std::map<int, int> _clientToCgi;
 
 			public:
-				Manager() {}
-				~Manager() {}
+				ProcessManager() {}
+				~ProcessManager() {}
 
 				static void sigchldHandler(int);
 

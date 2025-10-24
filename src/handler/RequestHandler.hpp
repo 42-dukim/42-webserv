@@ -13,7 +13,8 @@
 #include "builder/ErrorBuilder.hpp"
 #include "builder/FileBuilder.hpp"
 #include "builder/RedirectBuilder.hpp"
-#include "cgi/Builder.hpp"
+#include "cgi/Executor.hpp"
+#include "cgi/ProcessManager.hpp"
 
 namespace router {
 	struct RouteDecision;
@@ -25,7 +26,7 @@ namespace handler {
 			router::Router _router;
 			std::map<router::RouteDecision::Action, builder::IBuilder*> _builders;
 			builder::IBuilder* _defaultBuilder;
-			cgi::Manager _cgiManager;
+			cgi::ProcessManager _cgiProcessManager;
 
 			const builder::IBuilder* selectBuilder(router::RouteDecision::Action) const;
 
