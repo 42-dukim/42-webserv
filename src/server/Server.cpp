@@ -113,8 +113,8 @@ void Server::run() {
 	if (sigaction(SIGCHLD, &sa, NULL) == -1) throw Exception("sigaction failed");
 	_epollManager.init();
 
-	for (std::map<int, config::Config>::iterator it = _configs.begin(); it != _configs.end();
-		 ++it) {
+	std::map<int, config::Config>::iterator it;
+	for (it = _configs.begin(); it != _configs.end(); ++it) {
 		initServer(it->first);
 	}
 	loop();

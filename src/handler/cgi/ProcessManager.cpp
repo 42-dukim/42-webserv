@@ -27,6 +27,7 @@ void ProcessManager::registerProcess(pid_t pid, int cgiFd, int clientFd) {
 	_clientToCgi[clientFd] = cgiFd;
 }
 
+// rename 고민
 void ProcessManager::handleCgiEvent(int cgiFd, server::EpollManager& epollManager) {
 	std::map<int, Process>::iterator it = _activeProcesses.find(cgiFd);
 	if (it == _activeProcesses.end()) {
