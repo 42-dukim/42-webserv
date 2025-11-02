@@ -27,22 +27,23 @@ namespace handler {
 		}
 
 		inline std::string makeErrorResponse(
-			const config::Config& config,
+			const config::Config* config,
 			http::StatusCode::Value status = http::StatusCode::InternalServerError) {
 			std::string statusLine = "HTTP/1.1 " + int_tostr(status) + " " +
 									 http::StatusCode::to_reasonPhrase(status) + "\r\n";
-			std::map<int, std::string> errorPages = config.getErrorPages();
-			std::map<int, std::string>::const_iterator it = errorPages.find(status);
-
-			if (it != errorPages.end()) {
-				FileInfo body = readFile(it->second.c_str());
-				if (body.error == FileInfo::NONE) {
-					std::string httpHeader =
-						statusLine + "Content-Type: " +
-						http::ContentType::to_string(http::ContentType::CONTENT_TEXT_HTML) +
-						"\r\n" + "Content-Length: " + int_tostr(body.content.size()) + "\r\n" +
-						"Server: webserv\r\n";
-					return httpHeader + "\r\n" + body.content;
+			if (config != NULL) {
+				std::map<int, std::string> errorPages = config->getErrorPages();
+				std::map<int, std::string>::const_iterator it = errorPages.find(status);
+				if (it != errorPages.end()) {
+					FileInfo body = readFile(it->second.c_str());
+					if (body.error == FileInfo::NONE) {
+						std::string httpHeader =
+							statusLine + "Content-Type: " +
+							http::ContentType::to_string(http::ContentType::CONTENT_TEXT_HTML) +
+							"\r\n" + "Content-Length: " + int_tostr(body.content.size()) + "\r\n" +
+							"Server: webserv\r\n";
+						return httpHeader + "\r\n" + body.content;
+					}
 				}
 			}
 			std::string httpHeader =

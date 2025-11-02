@@ -47,9 +47,9 @@ EventHandler::Result EventHandler::handleCgiEvent(int fd, uint32_t, const config
 	std::string rawResponse;
 	try {
 		std::string cgiOutput = _cgiProcessManager.getResponse(fd);
-		rawResponse = config ? utils::makeCgiResponse(cgiOutput) : utils::makeErrorResponse(*config);
+		rawResponse = config ? utils::makeCgiResponse(cgiOutput) : utils::makeErrorResponse(config);
 	} catch (const handler::Exception&) {
-		rawResponse = utils::makeErrorResponse(*config);
+		rawResponse = utils::makeErrorResponse(config);
 	}
 	_cgiProcessManager.removeCgiProcess(clientFd);
 	_cgiClientConfigs.erase(clientFd);
