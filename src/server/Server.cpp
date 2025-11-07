@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include "../http/serializer/Serializer.hpp"
 #include "epoll/exception/EpollException.hpp"
 #include "exception/Exception.hpp"
 #include "wrapper/SocketWrapper.hpp"
@@ -74,10 +73,28 @@ void Server::handleEvents() {
 			_eventHandler.handleEvent(eventFd, event.events, findConfig(localPort), _epollManager);
 
 		if (result.response.fd != -1) {
-			sendResponse(result.response.fd, result.response.data);
-			if (result.response.closeAfterSend) {
-				_eventHandler.cleanup(result.response.fd, _epollManager);
-				_epollManager.remove(result.response.fd);
+			std::map<int, ResponseSender>::iterator it = _responseSenders.find(result.response.fd);
+			if (it == _responseSenders.end()) {
+				_responseSenders.emplace(result.response.fd,
+										 ResponseSender(result.response.fd, result.response.data));
+				_epollManager.modify(result.response.fd, EPOLLIN | EPOLLOUT | EPOLLRDHUP);
+				it = _responseSenders.find(result.response.fd);
+
+				SendResult sendResult = it->second.send();
+				if (sendResult == SendResult::SUCCESS || sendResult == SendResult::ERROR) {
+					_eventHandler.cleanup(result.response.fd, _epollManager);
+					_epollManager.remove(result.response.fd);
+					_responseSenders.erase(it);
+					continue;
+				}
+			} else if (event.events & EPOLLOUT) {
+				SendResult sendResult = it->second.send();
+				if (sendResult == SendResult::SUCCESS || sendResult == SendResult::ERROR) {
+					_eventHandler.cleanup(result.response.fd, _epollManager);
+					_epollManager.remove(result.response.fd);
+					_responseSenders.erase(it);
+					continue;
+				}
 			}
 		}
 
@@ -85,6 +102,7 @@ void Server::handleEvents() {
 			(result.closeFd != result.response.fd || !result.response.closeAfterSend)) {
 			_eventHandler.cleanup(result.closeFd, _epollManager);
 			_epollManager.remove(result.closeFd);
+			_responseSenders.erase(result.closeFd);
 		}
 	}
 }
@@ -93,15 +111,6 @@ const config::Config* Server::findConfig(int localPort) const {
 	std::map<int, config::Config>::const_iterator it = _configs.find(localPort);
 	if (it != _configs.end()) return &it->second;
 	return NULL;
-}
-
-void Server::sendResponse(int socketFd, const http::Packet& httpResponse) {
-	std::string rawResponse = http::Serializer::serialize(httpResponse);
-	::write(socketFd, rawResponse.c_str(), rawResponse.size());
-}
-
-void Server::sendResponse(int socketFd, const std::string& rawResponse) {
-	::write(socketFd, rawResponse.c_str(), rawResponse.size());
 }
 
 void Server::run() {
@@ -118,5 +127,23 @@ void Server::run() {
 		initServer(it->first);
 	}
 	loop();
+}
+
+SendResult ResponseSender::send() {
+	size_t remaining = _responseBuffer.size() - _responseSent;
+	size_t toSend = std::min(remaining, static_cast<size_t>(server::defaults::BUFFER_SIZE));
+
+	ssize_t bytesSent =
+		::send(_socketFd, _responseBuffer.c_str() + _responseSent, toSend, MSG_NOSIGNAL);
+	if (bytesSent > 0) {
+		_responseSent += bytesSent;
+	} else if (bytesSent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+		return SendResult::RETRY;
+	} else {
+		return SendResult::ERROR;  // Error occurred -> 상위에서 cleanup 처리
+	}
+
+	if (_responseSent >= _responseBuffer.size()) return SendResult::SUCCESS;
+	return SendResult::RETRY;
 }
 // namespace server
