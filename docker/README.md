@@ -28,7 +28,7 @@ docker compose build
 
 HTTP 부하 테스트는 `grafana/k6` 이미지를 이용한 별도 서비스로 실행할 수 있습니다.
 
-- ip 주소 차기
+- ip 주소 찾기
   ```bash
   ip addr show
   ```
