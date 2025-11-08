@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include "../http/serializer/Serializer.hpp"
 #include "epoll/exception/EpollException.hpp"
 #include "exception/Exception.hpp"
 #include "wrapper/SocketWrapper.hpp"
@@ -64,6 +63,17 @@ void Server::handleEvents() {
 			continue;
 		}
 
+		std::map<int, ResponseSender>::iterator senderIt = _responseSenders.find(eventFd);
+		if (senderIt != _responseSenders.end() && (event.events & EPOLLOUT)) {
+			SendResult sendResult = senderIt->second.send();
+			if (sendResult == SendResult::SUCCESS || sendResult == SendResult::ERROR) {
+				_eventHandler.cleanup(eventFd, _epollManager);
+				_epollManager.remove(eventFd);
+				_responseSenders.erase(senderIt);
+			}
+			continue;  // ResponseSender가 있으면 다른 이벤트 처리 안 함
+		}
+
 		int localPort = 0;
 		sockaddr_in addr;
 		socklen_t len = sizeof(addr);
@@ -74,17 +84,16 @@ void Server::handleEvents() {
 			_eventHandler.handleEvent(eventFd, event.events, findConfig(localPort), _epollManager);
 
 		if (result.response.fd != -1) {
-			sendResponse(result.response.fd, result.response.data);
-			if (result.response.closeAfterSend) {
-				_eventHandler.cleanup(result.response.fd, _epollManager);
-				_epollManager.remove(result.response.fd);
-			}
+			_responseSenders.emplace(result.response.fd,
+									 ResponseSender(result.response.fd, result.response.data));
+			_epollManager.modify(result.response.fd, EPOLLIN | EPOLLOUT | EPOLLRDHUP);
 		}
 
 		if (result.closeFd != -1 &&
 			(result.closeFd != result.response.fd || !result.response.closeAfterSend)) {
 			_eventHandler.cleanup(result.closeFd, _epollManager);
 			_epollManager.remove(result.closeFd);
+			_responseSenders.erase(result.closeFd);
 		}
 	}
 }
@@ -93,15 +102,6 @@ const config::Config* Server::findConfig(int localPort) const {
 	std::map<int, config::Config>::const_iterator it = _configs.find(localPort);
 	if (it != _configs.end()) return &it->second;
 	return NULL;
-}
-
-void Server::sendResponse(int socketFd, const http::Packet& httpResponse) {
-	std::string rawResponse = http::Serializer::serialize(httpResponse);
-	::write(socketFd, rawResponse.c_str(), rawResponse.size());
-}
-
-void Server::sendResponse(int socketFd, const std::string& rawResponse) {
-	::write(socketFd, rawResponse.c_str(), rawResponse.size());
 }
 
 void Server::run() {
@@ -119,4 +119,3 @@ void Server::run() {
 	}
 	loop();
 }
-// namespace server

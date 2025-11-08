@@ -30,6 +30,7 @@ namespace server {
 			void init();
 			void add(int);
 			void add(int, unsigned int);
+			void modify(int, unsigned int);
 			void remove(int);
 			void wait();
 	};
